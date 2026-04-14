@@ -2,10 +2,11 @@
 
 namespace Laravel\Ai\Gateway\Anthropic\Concerns;
 
+use Laravel\Ai\DocumentSchema;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\TextGenerationOptions;
-use Laravel\Ai\ObjectSchema;
 use Laravel\Ai\Providers\Provider;
+use Laravel\Ai\Schema;
 
 trait BuildsTextRequests
 {
@@ -18,7 +19,7 @@ trait BuildsTextRequests
         ?string $instructions,
         array $messages,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
     ): array {
         $body = [
@@ -39,7 +40,7 @@ trait BuildsTextRequests
             $body['output_config'] = [
                 'format' => [
                     'type' => 'json_schema',
-                    'schema' => (new ObjectSchema($schema))->toSchema(),
+                    'schema' => $schema->toSchema(),
                 ],
             ];
 
@@ -72,7 +73,7 @@ trait BuildsTextRequests
      *
      * Without thinking: structured-only forces the synthetic tool, tools+schema uses "any".
      */
-    protected function resolveToolChoice(?array $schema, array $tools, array $providerOptions): array
+    protected function resolveToolChoice(?Schema $schema, array $tools, array $providerOptions): array
     {
         if (! filled($schema) || isset($providerOptions['thinking'])) {
             return ['type' => 'auto'];
@@ -96,9 +97,17 @@ trait BuildsTextRequests
     /**
      * Build the synthetic tool definition for structured output.
      */
-    protected function buildStructuredOutputTool(array $schema): array
+    protected function buildStructuredOutputTool(Schema $schema): array
     {
-        $schemaArray = (new ObjectSchema($schema))->toSchema();
+        $schemaArray = $schema->toSchema();
+
+        if ($schema instanceof DocumentSchema) {
+            return [
+                'name' => 'output_structured_data',
+                'description' => 'Output the structured data matching the required schema.',
+                'input_schema' => $schemaArray,
+            ];
+        }
 
         return [
             'name' => 'output_structured_data',

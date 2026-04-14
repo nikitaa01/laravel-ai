@@ -31,6 +31,7 @@ use Laravel\Ai\Responses\ImageResponse;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Ai\Responses\TextResponse;
 use Laravel\Ai\Responses\TranscriptionResponse;
+use Laravel\Ai\Schema;
 use Prism\Prism\Enums\Provider as PrismProvider;
 use Prism\Prism\Exceptions\PrismException as PrismVendorException;
 use Prism\Prism\Facades\Prism;
@@ -61,13 +62,13 @@ class PrismGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse {
         [$request, $structured] = [
             $this->createPrismTextRequest($provider, $model, $schema, $options, $timeout),
-            ! empty($schema),
+            $schema !== null,
         ];
 
         if (! empty($instructions)) {
@@ -122,13 +123,13 @@ class PrismGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator {
         [$request, $structured] = [
             $this->createPrismTextRequest($provider, $model, $schema, $options, $timeout),
-            ! empty($schema),
+            $schema !== null,
         ];
 
         if (! empty($instructions)) {

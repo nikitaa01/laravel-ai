@@ -17,13 +17,14 @@ use Laravel\Ai\Responses\Data\ToolResult;
 use Laravel\Ai\Responses\Data\Usage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Schema;
 
 trait ParsesTextResponses
 {
     /**
      * Validate the Groq response data.
      *
-     * @throws \Laravel\Ai\Exceptions\AiException
+     * @throws AiException
      */
     protected function validateTextResponse(array $data): void
     {
@@ -44,7 +45,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?string $instructions = null,
         array $originalMessages = [],
@@ -72,7 +73,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         Collection $steps,
         Collection $messages,
         ?string $instructions = null,
@@ -212,7 +213,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         Collection $steps,
         Collection $messages,
         ?string $instructions,

@@ -11,6 +11,7 @@ use Laravel\Ai\Gateway\Concerns\InvokesTools;
 use Laravel\Ai\Gateway\Concerns\ParsesServerSentEvents;
 use Laravel\Ai\Gateway\TextGenerationOptions;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Schema;
 
 class GroqGateway implements TextGateway
 {
@@ -39,7 +40,7 @@ class GroqGateway implements TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse {
@@ -84,7 +85,7 @@ class GroqGateway implements TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator {

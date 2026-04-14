@@ -5,6 +5,7 @@ namespace Laravel\Ai\Providers\Concerns;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Laravel\Ai\Contracts\Conversational;
+use Laravel\Ai\Contracts\HasJsonSchemaDocument;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Events\AgentStreamed;
@@ -37,7 +38,7 @@ trait StreamsText
 
                 $agent = $prompt->agent;
 
-                if ($agent instanceof HasStructuredOutput) {
+                if ($agent instanceof HasStructuredOutput || $agent instanceof HasJsonSchemaDocument) {
                     throw new InvalidArgumentException('Streaming structured output is not currently supported.');
                 }
 

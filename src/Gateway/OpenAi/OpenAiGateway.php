@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use Laravel\Ai\Contracts\Files\HasName;
 use Laravel\Ai\Contracts\Files\TranscribableAudio;
 use Laravel\Ai\Contracts\Gateway\Gateway;
 use Laravel\Ai\Contracts\Providers\AudioProvider;
@@ -30,6 +31,7 @@ use Laravel\Ai\Responses\EmbeddingsResponse;
 use Laravel\Ai\Responses\ImageResponse;
 use Laravel\Ai\Responses\TextResponse;
 use Laravel\Ai\Responses\TranscriptionResponse;
+use Laravel\Ai\Schema;
 
 class OpenAiGateway implements Gateway
 {
@@ -58,7 +60,7 @@ class OpenAiGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse {
@@ -88,7 +90,7 @@ class OpenAiGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator {
@@ -289,7 +291,7 @@ class OpenAiGateway implements Gateway
      */
     protected function audioFilename(TranscribableAudio $audio): string
     {
-        if ($audio instanceof \Laravel\Ai\Contracts\Files\HasName && $audio->name()) {
+        if ($audio instanceof HasName && $audio->name()) {
             return $audio->name();
         }
 

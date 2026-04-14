@@ -3,13 +3,13 @@
 namespace Laravel\Ai\Providers\Concerns;
 
 use Closure;
-use Illuminate\JsonSchema\JsonSchemaTypeFactory;
 use Illuminate\Support\Str;
 use Laravel\Ai\Ai;
 use Laravel\Ai\Concerns\RemembersConversations;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\ConversationStore;
+use Laravel\Ai\Contracts\HasJsonSchemaDocument;
 use Laravel\Ai\Contracts\HasMiddleware;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
@@ -24,6 +24,7 @@ use Laravel\Ai\Middleware\RememberConversation;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Laravel\Ai\Responses\AgentResponse;
 use Laravel\Ai\Responses\StructuredAgentResponse;
+use Laravel\Ai\StructuredOutputSchema;
 
 use function Laravel\Ai\pipeline;
 
@@ -62,12 +63,12 @@ trait GeneratesText
                     (string) $agent->instructions(),
                     $messages,
                     $agent instanceof HasTools ? $agent->tools() : [],
-                    $agent instanceof HasStructuredOutput ? $agent->schema(new JsonSchemaTypeFactory) : null,
+                    StructuredOutputSchema::forAgent($agent),
                     TextGenerationOptions::forAgent($agent),
                     $prompt->timeout,
                 );
 
-                return $agent instanceof HasStructuredOutput
+                return $agent instanceof HasStructuredOutput || $agent instanceof HasJsonSchemaDocument
                     ? (new StructuredAgentResponse($invocationId, $response->structured, $response->text, $response->usage, $response->meta))
                         ->withToolCallsAndResults($response->toolCalls, $response->toolResults)
                         ->withSteps($response->steps)

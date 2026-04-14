@@ -10,6 +10,7 @@ use Laravel\Ai\Responses\Data\ToolCall;
 use Laravel\Ai\Responses\Data\ToolResult;
 use Laravel\Ai\Responses\Data\UrlCitation;
 use Laravel\Ai\Responses\Data\Usage;
+use Laravel\Ai\Schema;
 use Laravel\Ai\Streaming\Events\Citation as CitationEvent;
 use Laravel\Ai\Streaming\Events\Error;
 use Laravel\Ai\Streaming\Events\ProviderToolEvent;
@@ -34,7 +35,7 @@ trait HandlesTextStreaming
         Provider $provider,
         string $model,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
         $streamBody,
         array $requestBody = [],
@@ -358,7 +359,7 @@ trait HandlesTextStreaming
         Provider $provider,
         string $model,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
         array $pendingToolCalls,
         array $responseContent,
