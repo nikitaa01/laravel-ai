@@ -4,17 +4,17 @@ namespace Laravel\Ai\Gateway;
 
 use Closure;
 use Generator;
-use Illuminate\JsonSchema\Types\ObjectType;
-use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Ai\Contracts\Gateway\TextGateway;
 use Laravel\Ai\Contracts\Providers\TextProvider;
+use Laravel\Ai\DocumentSchema;
 use Laravel\Ai\Messages\UserMessage;
 use Laravel\Ai\Responses\Data\Meta;
 use Laravel\Ai\Responses\Data\Usage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Schema;
 use Laravel\Ai\Streaming\Events\StreamEnd;
 use Laravel\Ai\Streaming\Events\StreamStart;
 use Laravel\Ai\Streaming\Events\TextDelta;
@@ -22,6 +22,7 @@ use Laravel\Ai\Streaming\Events\TextEnd;
 use Laravel\Ai\Streaming\Events\TextStart;
 use RuntimeException;
 
+use function Laravel\Ai\generate_fake_data_for_json_schema_document;
 use function Laravel\Ai\generate_fake_data_for_json_schema_type;
 use function Laravel\Ai\ulid;
 
@@ -37,8 +38,6 @@ class FakeTextGateway implements TextGateway
 
     /**
      * Generate text representing the next message in a conversation.
-     *
-     * @param  array<string, Type>|null  $schema
      */
     public function generateText(
         TextProvider $provider,
@@ -46,7 +45,7 @@ class FakeTextGateway implements TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse {
@@ -61,8 +60,6 @@ class FakeTextGateway implements TextGateway
 
     /**
      * Stream text representing the next message in a conversation.
-     *
-     * @param  array<string, Type>|null  $schema
      */
     public function streamText(
         string $invocationId,
@@ -71,7 +68,7 @@ class FakeTextGateway implements TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator {
@@ -111,7 +108,7 @@ class FakeTextGateway implements TextGateway
     /**
      * Get the next response instance.
      */
-    protected function nextResponse(TextProvider $provider, string $model, string $prompt, Collection $attachments, ?array $schema): mixed
+    protected function nextResponse(TextProvider $provider, string $model, string $prompt, Collection $attachments, ?Schema $schema): mixed
     {
         $response = is_array($this->responses)
             ? ($this->responses[$this->currentResponseIndex] ?? null)
@@ -131,7 +128,7 @@ class FakeTextGateway implements TextGateway
         string $model,
         string $prompt,
         Collection $attachments,
-        ?array $schema): mixed
+        ?Schema $schema): mixed
     {
         if (is_null($response)) {
             if ($this->preventStrayPrompts) {
@@ -140,7 +137,9 @@ class FakeTextGateway implements TextGateway
 
             $response = is_null($schema)
                 ? 'Fake response for prompt: '.Str::words($prompt, 10)
-                : generate_fake_data_for_json_schema_type(new ObjectType($schema));
+                : ($schema instanceof DocumentSchema
+                    ? generate_fake_data_for_json_schema_document($schema->toSchema())
+                    : generate_fake_data_for_json_schema_type($schema->schema));
         }
 
         return match (true) {

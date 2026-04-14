@@ -134,3 +134,89 @@ function generate_fake_data_for_json_schema_type(Type $type): mixed
         default => null,
     };
 }
+
+/**
+ * Generate fake data from a JSON Schema document array (supports $ref to #/$defs/...).
+ *
+ * @param  array<string, mixed>  $schema
+ * @param  array<string, mixed>|null  $root
+ * @return array<string, mixed>|list<mixed>|mixed
+ */
+function generate_fake_data_for_json_schema_document(array $schema, ?array $root = null): mixed
+{
+    $root ??= $schema;
+
+    if (isset($schema['$ref']) && is_string($schema['$ref'])) {
+        $resolved = resolve_json_schema_pointer($schema['$ref'], $root);
+
+        if (is_array($resolved)) {
+            return generate_fake_data_for_json_schema_document($resolved, $root);
+        }
+    }
+
+    $type = $schema['type'] ?? null;
+
+    if ($type === 'object' || (is_array($type) && in_array('object', $type, true))) {
+        $result = [];
+
+        foreach ($schema['properties'] ?? [] as $key => $prop) {
+            if (is_array($prop)) {
+                $result[$key] = generate_fake_data_for_json_schema_document($prop, $root);
+            }
+        }
+
+        return $result;
+    }
+
+    if ($type === 'array' || (is_array($type) && in_array('array', $type, true))) {
+        $items = $schema['items'] ?? null;
+
+        if (! is_array($items)) {
+            return [];
+        }
+
+        return [generate_fake_data_for_json_schema_document($items, $root)];
+    }
+
+    if ($type === 'string' || (is_array($type) && in_array('string', $type, true))) {
+        return 'string';
+    }
+
+    if ($type === 'integer' || (is_array($type) && in_array('integer', $type, true))) {
+        return 0;
+    }
+
+    if ($type === 'number' || (is_array($type) && in_array('number', $type, true))) {
+        return 0.0;
+    }
+
+    if ($type === 'boolean' || (is_array($type) && in_array('boolean', $type, true))) {
+        return true;
+    }
+
+    return [];
+}
+
+/**
+ * @param  array<string, mixed>  $root
+ * @return array<string, mixed>|null
+ */
+function resolve_json_schema_pointer(string $ref, array $root): ?array
+{
+    if (! str_starts_with($ref, '#/')) {
+        return null;
+    }
+
+    $segments = explode('/', substr($ref, 2));
+    $current = $root;
+
+    foreach ($segments as $segment) {
+        if (! is_array($current) || ! array_key_exists($segment, $current)) {
+            return null;
+        }
+
+        $current = $current[$segment];
+    }
+
+    return is_array($current) ? $current : null;
+}

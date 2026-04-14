@@ -2,16 +2,16 @@
 
 namespace Laravel\Ai;
 
-use Illuminate\JsonSchema\Types\ObjectType;
 use Laravel\Ai\JsonSchema\Concerns\NormalizesJsonSchema;
+use Laravel\Ai\JsonSchema\RawJsonSchemaType;
 use Prism\Prism\Contracts\HasSchemaType;
 
-class ObjectSchema extends Schema implements HasSchemaType
+class DocumentSchema extends Schema implements HasSchemaType
 {
     use NormalizesJsonSchema;
 
     /**
-     * Create a new output schema.
+     * @param  array<string, mixed>  $schema  Full JSON Schema document (e.g. root object with optional $defs and $ref).
      */
     public function __construct(
         array $schema,
@@ -19,15 +19,13 @@ class ObjectSchema extends Schema implements HasSchemaType
         bool $strict = true
     ) {
         parent::__construct(
-            schema: (new ObjectType($schema))->withoutAdditionalProperties(),
+            schema: new RawJsonSchemaType($schema),
             name: $name,
             strict: $strict
         );
     }
 
     /**
-     * Get the array representation of the schema with additional properties disabled on all nested objects.
-     *
      * @return array<string, mixed>
      */
     public function toSchema(): array
@@ -35,9 +33,6 @@ class ObjectSchema extends Schema implements HasSchemaType
         return static::disableAdditionalProperties(parent::toSchema());
     }
 
-    /**
-     * Get the Prism-compatible schema type.
-     */
     public function schemaType(): string
     {
         return 'object';

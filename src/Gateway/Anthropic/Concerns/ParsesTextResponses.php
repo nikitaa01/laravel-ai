@@ -18,6 +18,7 @@ use Laravel\Ai\Responses\Data\UrlCitation;
 use Laravel\Ai\Responses\Data\Usage;
 use Laravel\Ai\Responses\StructuredTextResponse;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Schema;
 
 trait ParsesTextResponses
 {
@@ -45,7 +46,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         array $requestBody = [],
     ): TextResponse {
@@ -70,7 +71,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         Collection $steps,
         Collection $messages,
         array $requestBody,
@@ -186,7 +187,7 @@ trait ParsesTextResponses
         Provider $provider,
         bool $structured,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         Collection $steps,
         Collection $messages,
         array $requestBody,

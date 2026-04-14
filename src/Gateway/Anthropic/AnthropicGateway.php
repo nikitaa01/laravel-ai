@@ -24,6 +24,7 @@ use Laravel\Ai\Responses\EmbeddingsResponse;
 use Laravel\Ai\Responses\ImageResponse;
 use Laravel\Ai\Responses\TextResponse;
 use Laravel\Ai\Responses\TranscriptionResponse;
+use Laravel\Ai\Schema;
 use LogicException;
 
 class AnthropicGateway implements Gateway
@@ -65,7 +66,7 @@ class AnthropicGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse {
@@ -109,7 +110,7 @@ class AnthropicGateway implements Gateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator {

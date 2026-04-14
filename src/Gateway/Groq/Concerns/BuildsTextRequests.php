@@ -4,8 +4,8 @@ namespace Laravel\Ai\Gateway\Groq\Concerns;
 
 use Illuminate\Support\Arr;
 use Laravel\Ai\Gateway\TextGenerationOptions;
-use Laravel\Ai\ObjectSchema;
 use Laravel\Ai\Providers\Provider;
+use Laravel\Ai\Schema;
 
 trait BuildsTextRequests
 {
@@ -18,7 +18,7 @@ trait BuildsTextRequests
         ?string $instructions,
         array $messages,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
     ): array {
         $body = [
@@ -59,11 +59,9 @@ trait BuildsTextRequests
     /**
      * Build the response format options for structured output.
      */
-    protected function buildResponseFormat(array $schema): array
+    protected function buildResponseFormat(Schema $schema): array
     {
-        $objectSchema = new ObjectSchema($schema);
-
-        $schemaArray = $objectSchema->toSchema();
+        $schemaArray = $schema->toSchema();
 
         return [
             'type' => 'json_schema',

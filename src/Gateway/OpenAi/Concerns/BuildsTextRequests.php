@@ -5,8 +5,8 @@ namespace Laravel\Ai\Gateway\OpenAi\Concerns;
 use Illuminate\Support\Arr;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\TextGenerationOptions;
-use Laravel\Ai\ObjectSchema;
 use Laravel\Ai\Providers\Provider;
+use Laravel\Ai\Schema;
 
 trait BuildsTextRequests
 {
@@ -19,7 +19,7 @@ trait BuildsTextRequests
         ?string $instructions,
         array $messages,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
     ): array {
         $input = $this->mapMessagesToInput($messages, $instructions);
@@ -57,11 +57,9 @@ trait BuildsTextRequests
     /**
      * Build the text format options for structured output.
      */
-    protected function buildSchemaFormat(array $schema): array
+    protected function buildSchemaFormat(Schema $schema): array
     {
-        $objectSchema = new ObjectSchema($schema);
-
-        $schemaArray = $objectSchema->toSchema();
+        $schemaArray = $schema->toSchema();
 
         return [
             'format' => [

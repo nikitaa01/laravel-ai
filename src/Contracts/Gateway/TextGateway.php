@@ -4,12 +4,12 @@ namespace Laravel\Ai\Contracts\Gateway;
 
 use Closure;
 use Generator;
-use Illuminate\JsonSchema\Types\Type;
 use Laravel\Ai\Contracts\Providers\TextProvider;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Gateway\TextGenerationOptions;
 use Laravel\Ai\Messages\Message;
 use Laravel\Ai\Responses\TextResponse;
+use Laravel\Ai\Schema;
 
 interface TextGateway
 {
@@ -18,7 +18,6 @@ interface TextGateway
      *
      * @param  Message[]  $messages
      * @param  Tool[]  $tools
-     * @param  array<string, Type>|null  $schema
      */
     public function generateText(
         TextProvider $provider,
@@ -26,7 +25,7 @@ interface TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): TextResponse;
@@ -36,7 +35,6 @@ interface TextGateway
      *
      * @param  Message[]  $messages
      * @param  Tool[]  $tools
-     * @param  array<string, Type>|null  $schema
      */
     public function streamText(
         string $invocationId,
@@ -45,7 +43,7 @@ interface TextGateway
         ?string $instructions,
         array $messages = [],
         array $tools = [],
-        ?array $schema = null,
+        ?Schema $schema = null,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ): Generator;

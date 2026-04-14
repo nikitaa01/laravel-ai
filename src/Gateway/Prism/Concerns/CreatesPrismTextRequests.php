@@ -5,9 +5,9 @@ namespace Laravel\Ai\Gateway\Prism\Concerns;
 use Laravel\Ai\Contracts\Prompt;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\TextGenerationOptions;
-use Laravel\Ai\ObjectSchema;
 use Laravel\Ai\Providers\OpenAiProvider;
 use Laravel\Ai\Providers\Provider;
+use Laravel\Ai\Schema;
 use Prism\Prism\Facades\Prism;
 
 trait CreatesPrismTextRequests
@@ -18,16 +18,16 @@ trait CreatesPrismTextRequests
     protected function createPrismTextRequest(
         Provider $provider,
         string $model,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options = null,
         ?int $timeout = null,
     ) {
         $request = tap(
-            ! empty($schema) ? Prism::structured() : Prism::text(),
+            $schema !== null ? Prism::structured() : Prism::text(),
             fn ($prism) => $this->configure($prism, $provider, $model)
         );
 
-        if (! empty($schema)) {
+        if ($schema !== null) {
             $request = $this->withStructuredOutputOptions($request, $provider, $schema);
         }
 
@@ -43,9 +43,9 @@ trait CreatesPrismTextRequests
     /**
      * Add structured output options to the request.
      */
-    protected function withStructuredOutputOptions($request, Provider $provider, array $schema)
+    protected function withStructuredOutputOptions($request, Provider $provider, Schema $schema)
     {
-        $request = $request->withSchema(new ObjectSchema($schema));
+        $request = $request->withSchema($schema);
 
         if ($provider instanceof OpenAiProvider) {
             $request = $request->withProviderOptions(['schema' => ['strict' => true]]);
@@ -57,7 +57,7 @@ trait CreatesPrismTextRequests
     /**
      * Add provider-specific options to the request.
      */
-    protected function withProviderOptions($request, Provider $provider, ?array $schema, ?TextGenerationOptions $options)
+    protected function withProviderOptions($request, Provider $provider, ?Schema $schema, ?TextGenerationOptions $options)
     {
         $agentProviderOptions = $options?->providerOptions(
             Lab::tryFrom($provider->driver()) ?? $provider->driver()

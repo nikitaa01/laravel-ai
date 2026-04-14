@@ -9,6 +9,7 @@ use Laravel\Ai\Providers\Provider;
 use Laravel\Ai\Responses\Data\ToolCall;
 use Laravel\Ai\Responses\Data\ToolResult;
 use Laravel\Ai\Responses\Data\Usage;
+use Laravel\Ai\Schema;
 use Laravel\Ai\Streaming\Events\Error;
 use Laravel\Ai\Streaming\Events\StreamEnd;
 use Laravel\Ai\Streaming\Events\StreamStart;
@@ -28,7 +29,7 @@ trait HandlesTextStreaming
         Provider $provider,
         string $model,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
         $streamBody,
         ?string $instructions = null,
@@ -191,7 +192,7 @@ trait HandlesTextStreaming
         Provider $provider,
         string $model,
         array $tools,
-        ?array $schema,
+        ?Schema $schema,
         ?TextGenerationOptions $options,
         array $mappedToolCalls,
         string $currentText,
